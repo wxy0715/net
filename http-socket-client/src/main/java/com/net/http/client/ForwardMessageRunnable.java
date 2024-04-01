@@ -1,4 +1,4 @@
-package com.net.http.client.service;
+package com.net.http.client;
 
 import com.net.common.constant.MessageType;
 import com.net.common.entity.Message;

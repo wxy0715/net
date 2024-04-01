@@ -1,8 +1,0 @@
-# 服务端ip
-serverIp: 127.0.0.1
-# 服务端ip
-serverPort: 23456
-# 本地ip
-localIp: 127.0.0.1
-# 本地ip
-localPort: 8000

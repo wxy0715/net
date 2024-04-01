@@ -1,4 +1,4 @@
-package com.net.http.client.service;
+package com.net.http.client;
 
 import com.alibaba.fastjson.JSON;
 import com.net.common.constant.Constant;
@@ -12,10 +12,7 @@ import com.net.common.util.ThreadPoolFactory;
 import com.net.http.client.config.ServerConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.InitializingBean;
-import org.springframework.stereotype.Component;
 
-import javax.annotation.Resource;
 import java.net.Socket;
 import java.net.SocketTimeoutException;
 import java.nio.charset.StandardCharsets;
@@ -27,18 +24,12 @@ import java.util.concurrent.TimeUnit;
  * 客户端
  * @author wxy
  */
-@Component
-public class Client extends Socket implements InitializingBean {
+public class Client extends Socket{
     private static final Logger log = LoggerFactory.getLogger(Client.class);
 
-    @Resource
-    private ServerConfig serverConfig;
-
-    @Override
-    public void afterPropertiesSet() throws Exception {
-        Socket clientSocket = null;
-        try {
-            clientSocket = new Socket(serverConfig.getServerIp(), serverConfig.getServerPort());
+    private static final ServerConfig serverConfig = ServerConfig.getInstance();
+    public static void main(String[] args) {
+        try (Socket clientSocket = new Socket(serverConfig.getServerIp(), serverConfig.getServerPort())){
             // 与服务的进行握手
             HttpMessageUtil.sendMessage(clientSocket.getOutputStream(), () -> new Message(MessageType.NEW_SOCKET, Constant.CONNECT.getBytes(StandardCharsets.UTF_8), new HashMap<>()));
             // 读取服务端返回消息
@@ -57,17 +48,15 @@ public class Client extends Socket implements InitializingBean {
         } catch (Exception e) {
             log.error("客户端异常推出:{}", Optional.ofNullable(e.getCause()).map(Throwable::getMessage).orElse(e.getMessage()));
         } finally {
-            CloseableUtils.close(clientSocket);
             // 监听结束要终止所有线程
             ThreadPoolFactory.shutdown();
         }
     }
 
-
     /**
      * 监听服务端消息
      */
-    public void messageListener(Socket clientSocket) {
+    public static void messageListener(Socket clientSocket) {
         while (!clientSocket.isClosed() && clientSocket.isConnected()) {
             try {
                 // 读取服务端消息
@@ -89,7 +78,7 @@ public class Client extends Socket implements InitializingBean {
     /**
      * 定时检查内网服务
      */
-    public void scheduleConnectionListener(Socket clientSocket) {
+    public static void scheduleConnectionListener(Socket clientSocket) {
         ThreadPoolFactory.scheduleAtFixedRate(() -> {
             boolean validate = HttpUtils.validate(serverConfig.getLocalIp(), serverConfig.getLocalPort());
             if (validate) {

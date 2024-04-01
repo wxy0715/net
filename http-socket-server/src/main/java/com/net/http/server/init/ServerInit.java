@@ -28,9 +28,7 @@ public class ServerInit implements ApplicationRunner {
 
     @Override
     public void run(ApplicationArguments args) {
-        ServerSocket serverSocket = null;
-        try {
-            serverSocket = new ServerSocket(serverConfig.getHttpPort());
+        try (ServerSocket serverSocket = new ServerSocket(serverConfig.getHttpPort())){
             log.info("服务端监听端口{}", serverConfig.getHttpPort());
             while (true) {
                 try {
@@ -51,8 +49,6 @@ public class ServerInit implements ApplicationRunner {
             }
         } catch (Exception e) {
             log.error("服务器异常退出", e);
-        } finally {
-            CloseableUtils.close(serverSocket);
         }
     }
 }

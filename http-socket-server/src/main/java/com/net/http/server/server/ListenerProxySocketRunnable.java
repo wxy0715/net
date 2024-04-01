@@ -41,14 +41,13 @@ public class ListenerProxySocketRunnable implements Runnable {
     public void run() {
         try (ServerSocket listenerProxySocket = new ServerSocket(proxyPort)){
             while (true) {
-                Socket socketWan = null;
+                Socket socketWan;
                 try {
                     socketWan = listenerProxySocket.accept();
                     socketWan.setSoTimeout(1000 * 60);
                     ThreadPoolFactory.execute(new SocketWanRunnable(socketWan, clientSocket, sessionId, addSocketWanMap(socketWan)));
                 } catch (Exception e) {
                     log.error("代理服务{}异常", proxyPort);
-                    CloseableUtils.close(socketWan);
                     break;
                 }
             }
