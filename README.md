@@ -20,17 +20,17 @@
 
 ```yml
 server:
-  port: 9090 # 服务启动端口
+  port: 19998 # 服务启动端口
 http:
   # 和客户端连接socket端口
   port: 19999
   # 超时时间（单位毫秒）
   timeout: 1800000
 ```
-
-**启动方式:** 下载http-socket-server.jar上传到linux服务器(也可以本地启动测试)
-
-**服务器启动命令:** java -jar http-socket-server.jar
+**服务器启动命令:**
+```
+java -jar http-socket-server.jar --server.port=19998 --http.port=19999
+```
 
 ![image-20240401124439185](https://wxy-md.oss-cn-shanghai.aliyuncs.com/image-20240401124439185.png)
 

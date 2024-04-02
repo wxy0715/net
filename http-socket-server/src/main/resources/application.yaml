@@ -1,6 +1,6 @@
 
 server:
-  port: 9090
+  port: 9091
 http:
   # 内网穿透端口
   port: 19999

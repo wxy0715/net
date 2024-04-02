@@ -19,6 +19,7 @@
         <module>http-socket-server</module>
         <module>http-socket-client</module>
         <module>http-netty-server</module>
+        <module>test</module>
     </modules>
 
     <properties>
