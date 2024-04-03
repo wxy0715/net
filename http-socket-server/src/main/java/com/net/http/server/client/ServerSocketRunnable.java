@@ -41,9 +41,11 @@ public class ServerSocketRunnable implements Runnable{
             while (!clientSocket.isClosed() && clientSocket.isConnected()) {
                 try {
                     Message message = HttpMessageUtil.readMessage(clientIn);
-                    log.info("服务端收到握手消息[{}]", JSON.toJSONString(message));
                     if (MessageType.CLOSE.equals(message.getMessageType())) {
                         break;
+                    }
+                    if (!MessageType.HTTP_FORWARD.equals(message.getMessageType())) {
+                        log.info("服务端收到握手消息[{}]", JSON.toJSONString(message));
                     }
                     // 根据不同消息类型发送消息
                     MessageStrategy<Message> iMessageStrategy = MessageContext.getMessageStrategy(message.getMessageType());

@@ -8,16 +8,20 @@ import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.*;
+import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.ConnectException;
 import java.net.Socket;
 import java.util.Objects;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 负责转发http 消息
  */
 public class ForwardMessageRunnable implements Runnable {
-
+    private final Lock lock = new ReentrantLock();
     private static final Logger log = LoggerFactory.getLogger(ForwardMessageRunnable.class);
     /**
      * 内网ip
@@ -52,8 +56,11 @@ public class ForwardMessageRunnable implements Runnable {
                 log.info("转发内网服务->{} 耗时->{}毫秒", message.getCarrier().getUri(), (System.currentTimeMillis() - start));
             }
             // 同步发送数据
-            synchronized (clientSocket) {
+            try {
+                lock.lock();
                 HttpMessageUtil.sendMessage(clientSocket.getOutputStream(), () -> new Message(MessageType.HTTP_FORWARD, data, message.getCarrier(), message.getSessionId(), message.getSocketWanId()));
+            } finally {
+                lock.unlock();
             }
         } catch (Exception e) {
             log.error("转发内网web 应用失败", e);

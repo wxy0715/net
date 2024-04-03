@@ -1,7 +1,6 @@
 package com.net.http.server.init;
 
 import cn.hutool.core.util.IdUtil;
-import com.net.common.util.CloseableUtils;
 import com.net.common.util.ThreadPoolFactory;
 import com.net.http.server.client.ServerSocketRunnable;
 import com.net.http.server.config.ServerConfig;
