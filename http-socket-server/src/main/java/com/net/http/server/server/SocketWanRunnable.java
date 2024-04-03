@@ -13,8 +13,6 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.Socket;
 import java.util.Objects;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * 接收浏览器消息
@@ -22,7 +20,6 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 @Slf4j
 public class SocketWanRunnable implements Runnable {
-    private final Lock lock = new ReentrantLock();
 
     /**
      * 浏览器socket
@@ -72,11 +69,8 @@ public class SocketWanRunnable implements Runnable {
                 }
                 HttpCarrier carrier = new HttpCarrier(request.getMethod(), request.getUri(), request.getHttpSessionId(), request.getUri() + request.getHttpSessionId(), System.currentTimeMillis());
                 // 发送消息给客户端
-                try {
-                    lock.lock();
+                synchronized (clientOut) {
                     HttpMessageUtil.sendMessage(clientOut, () -> new Message(MessageType.HTTP_FORWARD, request.getData(), carrier, sessionId, socketWanId));
-                } finally {
-                    lock.unlock();
                 }
             } catch (Exception e) {
                 break;
